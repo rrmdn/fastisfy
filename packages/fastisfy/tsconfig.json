@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "module": "UMD",
+    "moduleResolution": "node",
+    "downlevelIteration": true
+  },
+  "files": ["src/run.ts"],
+  "include": ["src/**/*.ts"],
+}
