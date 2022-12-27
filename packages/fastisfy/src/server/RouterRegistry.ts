@@ -6,7 +6,7 @@ import path from "path";
 
 export default class RouterRegistry {
   static allowedMethods = new Set(["get", "post", "put", "delete", "patch"]);
-  static ROOT_API = path.resolve(__dirname, "../api");
+  static ROOT_API = path.resolve(path.join(process.cwd(), "api"));
   handlersMap = new Map<string, string>();
   async scanDir(dir: string) {
     const entries = await fs.readdir(dir, { withFileTypes: true });

@@ -55,7 +55,7 @@ export const get = async function (req, rep, ctx) {
         id: "1",
         product_id,
         user_id: "",
-        rating: 4,
+        rating: 9,
         comment: "Great product",
         created_at: "2021-01-01",
         updated_at: "2021-01-01",

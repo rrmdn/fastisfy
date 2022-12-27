@@ -2,6 +2,7 @@ import { Command, Flags } from "@oclif/core";
 import * as fastify from "fastify";
 import chokidar from "chokidar";
 import RouterRegistry from "../server/RouterRegistry";
+import applyFeatures from "../server/applyFeatures";
 
 export default class Dev extends Command {
   static flags = {
@@ -16,12 +17,13 @@ export default class Dev extends Command {
   async run() {
     const { flags } = await this.parse(Dev);
     const routerRegistry = new RouterRegistry();
+    await routerRegistry.scanDir("api");
     const app = fastify.fastify();
     app.all(
       "*",
       async (req: fastify.FastifyRequest, rep: fastify.FastifyReply) => {
         const devApp = fastify.fastify();
-        await routerRegistry.scanDir("api");
+        await applyFeatures(devApp, { port: flags.port, safe: false });
         await routerRegistry.registerRoutes(devApp);
         const response = await new Promise<fastify.LightMyRequestResponse>(
           (resolve, reject) => {
@@ -55,6 +57,8 @@ export default class Dev extends Command {
 
     await app.listen({ port: flags.port });
     console.log("Development server started, listening on port", flags.port);
+    console.log("Watching for changes...");
+    console.log(RouterRegistry.ROOT_API);
     const watcher = chokidar
       .watch(RouterRegistry.ROOT_API, {})
       .on("change", async (entryPath) => {
