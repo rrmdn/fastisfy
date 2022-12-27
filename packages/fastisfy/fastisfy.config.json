@@ -1,0 +1,3 @@
+{
+  "features": ["swagger", "compression", "cors", "overload-protection"]
+}

@@ -1,0 +1,3 @@
+{
+  "feature": ["swagger", "compression", "cors", "under-pressure"]
+}
