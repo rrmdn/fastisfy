@@ -22,9 +22,6 @@
     ],
     "topicSeparator": " ",
     "topics": {
-      "hello": {
-        "description": "Say hello to the world and others"
-      }
     }
   },
   "scripts": {
@@ -34,13 +31,13 @@
     "postpack": "shx rm -f oclif.manifest.json",
     "posttest": "yarn lint",
     "prepack": "yarn build && oclif manifest && oclif readme",
-    "test": "mocha --forbid-only \"test/**/*.test.ts\"",
+    "test": "mocha --forbid-only \"src/**/*.test.ts\"",
     "version": "oclif readme && git add README.md"
   },
   "engines": {
     "node": ">=12.0.0"
   },
-  "bugs": "https://github.com/rrmdn/hello-world/issues",
+  "bugs": "https://github.com/rrmdn/fastisfy/issues",
   "keywords": [
     "oclif"
   ],
