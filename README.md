@@ -13,6 +13,13 @@ export const get = async (req, reply) => {
 };
 ```
 
+## Deployment
+
+On your root directory, run `fastisfy build` to build your project. The build artifacts will be stored in the `dist/` directory.
+
+Run `fastisfy start` to start the production server. You will be able to access your API at `http://localhost:3000/hello`, and it will return `{ "hello": "world" }`.
+
+
 Run `fastisfy dev` to start the development server. You will be able to access your API at `http://localhost:3000/hello`, and it will return `{ "hello": "world" }`.
 
 ## API
