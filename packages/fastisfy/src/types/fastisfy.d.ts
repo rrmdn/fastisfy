@@ -11,6 +11,11 @@ declare namespace fastisfy {
     import("@fastify/type-provider-typebox").TypeBoxTypeProvider
   >;
 
+  export type FastisfyCustomServer = (
+    app: FastisfyInstance,
+    opts: Record<string, any>
+  ) => Promise<void>;
+
   export type FastisfySchema = {
     body?: import("@sinclair/typebox").TSchema;
     querystring?: import("@sinclair/typebox").TSchema;

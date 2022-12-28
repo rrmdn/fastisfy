@@ -1,3 +1,4 @@
 {
-  "features": ["swagger", "compression", "cors", "overload-protection"]
+  "features": ["swagger", "compression", "cors", "overload-protection"],
+  "apiDir": "src/api"
 }

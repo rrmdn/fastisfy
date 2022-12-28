@@ -1,8 +1,10 @@
 import { Command, Flags } from "@oclif/core";
 import * as fastify from "fastify";
-import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
+import { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 import applyFeatures from "../server/applyFeatures";
 import RouterRegistry from "../server/RouterRegistry";
+import Discover from "../server/Discover/Discover";
+import path from "path";
 
 export default class Start extends Command {
   static flags = {
@@ -16,10 +18,13 @@ export default class Start extends Command {
   static description = "Start the production server";
   async run() {
     const { flags } = await this.parse(Start);
-    const routerRegistry = new RouterRegistry();
+    const config = await Discover.config();
+    const routerRegistry = new RouterRegistry(
+      path.resolve(path.join(process.cwd(), config.apiDir || "api"))
+    );
     const app = fastify.fastify().withTypeProvider<TypeBoxTypeProvider>();
     await applyFeatures(app, { port: flags.port, safe: true });
-    await routerRegistry.scanDir("api");
+    await routerRegistry.scanDir(routerRegistry.rootAPI);
     await routerRegistry.registerRoutes(app);
 
     app.setErrorHandler((err, req, rep) => {

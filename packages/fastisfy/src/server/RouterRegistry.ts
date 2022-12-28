@@ -6,8 +6,10 @@ import path from "path";
 
 export default class RouterRegistry {
   static allowedMethods = new Set(["get", "post", "put", "delete", "patch"]);
-  static ROOT_API = path.resolve(path.join(process.cwd(), "api"));
   handlersMap = new Map<string, string>();
+  constructor(
+    public rootAPI: string = path.resolve(path.join(process.cwd(), "api"))
+  ) {}
   async scanDir(dir: string) {
     const entries = await fs.readdir(dir, { withFileTypes: true });
     for (const entry of entries) {
@@ -45,10 +47,38 @@ export default class RouterRegistry {
 
     return result.code;
   }
+  /**
+   * Look for a file named _server.js or _server.ts in the api folder
+   * @param app The fastify instance
+   * @returns void
+   */
+  async loadServerFile(app: fastify.FastifyInstance) {
+    try {
+      let file: string | null = null;
+      try {
+        file = path.resolve(`${this.rootAPI}/_server.js`);
+        await fs.access(file);
+      } catch (error) {
+        try {
+          file = path.resolve(`${this.rootAPI}/_server.ts`);
+          await fs.access(file);
+        } catch (error) {
+          file = null;
+        }
+      }
+      if (!file) return;
+      const serverFile: { default: fastisfy.FastisfyCustomServer } =
+        await importFromString(await this.parseHandler(file));
+      await serverFile.default(app, {});
+    } catch (error) {
+      console.log('Custom server file not found. Skipping...')
+    }
+  }
   async registerRoutes(app: fastify.FastifyInstance) {
+    await this.loadServerFile(app);
     for (const [route, value] of this.handlersMap.entries()) {
       const routeHandler = await importFromString(value, {
-        dirname: RouterRegistry.ROOT_API,
+        dirname: this.rootAPI,
       });
 
       const methods = Object.getOwnPropertyNames(routeHandler).filter(

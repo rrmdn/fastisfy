@@ -3,6 +3,8 @@ import * as fastify from "fastify";
 import chokidar from "chokidar";
 import RouterRegistry from "../server/RouterRegistry";
 import applyFeatures from "../server/applyFeatures";
+import Discover from "../server/Discover/Discover";
+import path from "path";
 
 export default class Dev extends Command {
   static flags = {
@@ -16,8 +18,11 @@ export default class Dev extends Command {
   static description = "Run the development server";
   async run() {
     const { flags } = await this.parse(Dev);
-    const routerRegistry = new RouterRegistry();
-    await routerRegistry.scanDir("api");
+    const config = await Discover.config();
+    const routerRegistry = new RouterRegistry(
+      path.resolve(path.join(process.cwd(), config.apiDir || "api"))
+    );
+    await routerRegistry.scanDir(routerRegistry.rootAPI);
     const app = fastify.fastify();
     app.all(
       "*",
@@ -58,9 +63,9 @@ export default class Dev extends Command {
     await app.listen({ port: flags.port });
     console.log("Development server started, listening on port", flags.port);
     console.log("Watching for changes...");
-    console.log(RouterRegistry.ROOT_API);
+    console.log(routerRegistry.rootAPI);
     const watcher = chokidar
-      .watch(RouterRegistry.ROOT_API, {})
+      .watch(routerRegistry.rootAPI, {})
       .on("change", async (entryPath) => {
         console.log("Change detected, reloading...");
         await routerRegistry.parseRoute(entryPath);

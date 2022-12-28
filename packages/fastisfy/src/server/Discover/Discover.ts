@@ -5,6 +5,7 @@ import path from "path";
 
 const FastisfyConfig = Type.Object({
   features: Type.Array(Type.String()),
+  apiDir: Type.Optional(Type.String()),
 });
 
 const FastisfyConfigCompiler = TypeCompiler.Compile(FastisfyConfig);
