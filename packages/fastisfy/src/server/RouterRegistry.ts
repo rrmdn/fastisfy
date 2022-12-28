@@ -27,7 +27,8 @@ export default class RouterRegistry {
     const routePath = entryPath
       .split("api")[1]
       .split(".")[0]
-      .replace(/\[([^\]]+)\]/g, ":$1");
+      .replace(/\[([^\]]+)\]/g, ":$1")
+      .replace(/\/index$/, "");
     const handlerCode = await this.parseHandler(entryPath);
     this.handlersMap.set(routePath, handlerCode);
   }
@@ -35,7 +36,7 @@ export default class RouterRegistry {
     const result = await swc.transformFile(path, {
       jsc: {
         parser: {
-          syntax: "ecmascript",
+          syntax: path.endsWith(".ts") ? "typescript" : "ecmascript",
           dynamicImport: true,
         },
         transform: {},
@@ -59,11 +60,12 @@ export default class RouterRegistry {
       );
 
       for (const method of methods) {
+        const requestHandler = routeHandler[method] as fastisfy.RequestHandler;
         app[method](
           route,
-          { schema: routeHandler[`${method}Schema`] },
-          async (req: Request, res: Response) => {
-            await routeHandler[method](req, res, {});
+          { schema: requestHandler.schema },
+          async (req: fastisfy.Request, rep: fastisfy.Reply) => {
+            await requestHandler(req, rep);
           }
         );
         console.log(`Route: ${method.toUpperCase()} ${route}`);

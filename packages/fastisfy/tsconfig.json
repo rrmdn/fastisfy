@@ -8,7 +8,8 @@
     "declaration": true,
     "importHelpers": true,
     "module": "commonjs",
-    "target": "es2019"
+    "target": "es2019",
+    "types": ["types/fastisfy.d.ts"]
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "types/**/*.d.ts", "api/**/*.ts"]
 }

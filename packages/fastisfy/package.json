@@ -6,6 +6,7 @@
   "bin": {
     "fastisfy": "./bin/run"
   },
+  "types": "types/fastisfy.d.ts",
   "files": [
     "/bin",
     "/dist",
@@ -29,7 +30,7 @@
     "lint": "eslint . --ext .ts --config .eslintrc",
     "postpack": "shx rm -f oclif.manifest.json",
     "prepack": "yarn build && oclif manifest && oclif readme",
-    "test": "mocha --forbid-only --exit \"src/**/*.test.ts\"",
+    "test": "ts-mocha -p tsconfig.json --exit \"src/**/*.test.ts\"",
     "version": "oclif readme && git add README.md"
   },
   "engines": {
@@ -39,12 +40,12 @@
   "keywords": [
     "oclif"
   ],
-  "types": "dist/index.d.ts",
   "devDependencies": {
     "@oclif/test": "^2.2.16",
     "@swc/core": "^1.3.24",
     "@types/chai": "^4",
-    "@types/mocha": "^9.0.0",
+    "@types/expect": "^24.3.0",
+    "@types/mocha": "^10.0.1",
     "@types/node": "^16.18.10",
     "chai": "^4",
     "eslint": "^7.32.0",
@@ -53,6 +54,7 @@
     "mocha": "^9",
     "oclif": "^3",
     "shx": "^0.3.3",
+    "ts-mocha": "^10.0.0",
     "ts-node": "^10.9.1",
     "tslib": "^2.4.1",
     "typescript": "^4.9.4"
@@ -62,6 +64,7 @@
     "@fastify/cors": "^8.2.0",
     "@fastify/swagger": "^8.2.1",
     "@fastify/swagger-ui": "^1.3.0",
+    "@fastify/type-provider-typebox": "^2.4.0",
     "@fastify/under-pressure": "^8.2.0",
     "@oclif/core": "^1.22.0",
     "@oclif/plugin-help": "^5",

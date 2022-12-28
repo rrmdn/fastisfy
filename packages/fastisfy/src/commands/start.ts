@@ -1,5 +1,6 @@
 import { Command, Flags } from "@oclif/core";
 import * as fastify from "fastify";
+import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox'
 import applyFeatures from "../server/applyFeatures";
 import RouterRegistry from "../server/RouterRegistry";
 
@@ -16,7 +17,7 @@ export default class Start extends Command {
   async run() {
     const { flags } = await this.parse(Start);
     const routerRegistry = new RouterRegistry();
-    const app = fastify.fastify();
+    const app = fastify.fastify().withTypeProvider<TypeBoxTypeProvider>();
     await applyFeatures(app, { port: flags.port, safe: true });
     await routerRegistry.scanDir("api");
     await routerRegistry.registerRoutes(app);

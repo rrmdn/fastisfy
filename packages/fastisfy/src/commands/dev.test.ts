@@ -17,12 +17,14 @@ describe("dev", () => {
             created_at: "2021-01-01",
             id: "1",
             product_id: "123",
-            rating: 4,
+            rating: 9,
             updated_at: "2021-01-01",
             user_id: "",
           },
         ],
         meta: {
+          limit: 0,
+          offset: 0,
           total: 1,
         },
       });

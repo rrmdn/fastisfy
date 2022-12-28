@@ -1,52 +1,6 @@
-export const getSchema = {
-  params: {
-    type: "object",
-    properties: {
-      product_id: { type: "string" },
-    },
-    required: ["product_id"],
-  },
-  querystring: {
-    type: "object",
-    properties: {
-      limit: { type: "number" },
-      offset: { type: "number" },
-    },
-    required: [],
-  },
-  response: {
-    200: {
-      type: "object",
-      properties: {
-        data: {
-          type: "array",
-          items: {
-            type: "object",
-            properties: {
-              id: { type: "string" },
-              product_id: { type: "string" },
-              user_id: { type: "string" },
-              rating: { type: "number" },
-              comment: { type: "string" },
-              created_at: { type: "string" },
-              updated_at: { type: "string" },
-            },
-          },
-        },
-        meta: {
-          type: "object",
-          properties: {
-            limit: { type: "number" },
-            offset: { type: "number" },
-            total: { type: "number" },
-          },
-        },
-      },
-    },
-  },
-};
+import { Type } from "@sinclair/typebox";
 
-export const get = async function (req, rep, ctx) {
+export const get = async function (req, rep) {
   const { product_id } = req.params;
   const { limit, offset } = req.query;
   rep.send({
@@ -61,6 +15,36 @@ export const get = async function (req, rep, ctx) {
         updated_at: "2021-01-01",
       },
     ],
-    meta: { limit, offset, total: 1 },
+    meta: { limit: limit || 0, offset: offset || 0, total: 1 },
   });
+};
+
+get.schema = {
+  params: Type.Object({
+    product_id: Type.String(),
+  }),
+  querystring: Type.Object({
+    limit: Type.Optional(Type.Number()),
+    offset: Type.Optional(Type.Number()),
+  }),
+  response: {
+    200: Type.Object({
+      data: Type.Array(
+        Type.Object({
+          id: Type.String(),
+          product_id: Type.String(),
+          user_id: Type.String(),
+          rating: Type.Number(),
+          comment: Type.String(),
+          created_at: Type.String(),
+          updated_at: Type.String(),
+        })
+      ),
+      meta: Type.Object({
+        limit: Type.Number(),
+        offset: Type.Number(),
+        total: Type.Number(),
+      }),
+    }),
+  },
 };
