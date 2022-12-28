@@ -3,6 +3,11 @@
 Fastisfy is a satistfyingly fast and simple web framework to build REST APIs with Node.js on top of Fastify.
 You can define routes using Next.js-like API and use the power of Fastify to build your APIs.
 
+## Pre-requisites
+
+- Node.js 16 or higher
+- npx (comes with npm 5.2+)
+
 ## Usage
 
 Create `api` directory in your project root and create `hello.js` file in it.
@@ -13,14 +18,11 @@ export const get = async (req, reply) => {
 };
 ```
 
+Run `npx fastisfy dev` to start the development server. You will be able to access your API at `http://localhost:3000/hello`, and it will return `{ "hello": "world" }`.
+
 ## Deployment
 
-On your root directory, run `fastisfy build` to build your project. The build artifacts will be stored in the `dist/` directory.
-
-Run `fastisfy start` to start the production server. You will be able to access your API at `http://localhost:3000/hello`, and it will return `{ "hello": "world" }`.
-
-
-Run `fastisfy dev` to start the development server. You will be able to access your API at `http://localhost:3000/hello`, and it will return `{ "hello": "world" }`.
+Run `npx fastisfy start` to start the production server. Everything is the same as the development server, but it is optimized for production.
 
 ## API
 
@@ -49,27 +51,63 @@ export const get = async (req, reply) => {
 
 ### Route Schema
 
-You can define the schema of your routes by adding a schema export respective to the method name. For example, if you want to define the schema of `GET /users/[id]` route, you can create `users/[id].js` file and add `get` function and `getSchema` export.
+You can define the schema of your routes by adding a `schema` property to the method name. For example, if you want to define the schema of `GET /users/[id]` route, you can create `users/[id].js` file and add `get` function and assign the schema to `get.schema` property. The schema itself is a Fastify schema object built with [TypeBox](https://github.com/sinclairzx81/typebox).
 
 ```js
+import { Type } from "@sinclair/typebox";
+
 export const get = async (req, reply) => {
   const user = await getUser(req.params.id);
   reply.send({ name: user.name });
 };
 
-export const getSchema = {
+get.schema = {
   response: {
-    200: {
-      type: "object",
-      properties: {
-        name: { type: "string" },
-      },
-    },
+    200: Type.Object({
+      name: Type.String(),
+    }),
   },
 };
 ```
 
-The schema follows the [Fastify schema](https://www.fastify.io/docs/latest/Validation-and-Serialization/) format.
+### TypeScript Support
+
+Fastisfy emits TypeScript declaration files to help you write your routes in TypeScript. You can create `users/[id].ts` file and use TypeScript to define your routes.
+
+```ts
+import { Type } from "@sinclair/typebox";
+
+const getSchema = {
+  response: {
+    200: Type.Object({
+      name: Type.String(),
+    }),
+  },
+};
+
+export const get: fastisfy.RequestHandler<typeof getSchema> = async (
+  req,
+  rep
+) => {
+  const user = await getUser(req.params.id);
+  rep.status(200).send({ name: user.name });
+};
+
+get.schema = getSchema;
+```
+
+In the above example, `fastisfy.RequestHandler` is a type that takes the schema object as a generic type and returns a function that takes `fastify.Request` and `fastify.Reply` as arguments. The schema will be automatically recognized by TypeScript and you will get type checking for your routes.
+
+### Configuration
+
+You can create `fastisfy.config.js` file in your project root to customize the configuration. The file should export an object with the following properties:
+
+- `features` - An array of features to enable. Available features are:
+  - `cors` - Enable CORS support.
+  - `compression` - Enable compression.
+  - `overload-protection` - Enable overload protection.
+  - `swagger` - Enable Swagger schema generation.
+- `apiDir` - The directory that contains your API routes. Default is `api` in the `cwd`.
 
 ## License
 
