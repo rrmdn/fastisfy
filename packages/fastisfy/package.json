@@ -31,7 +31,7 @@
     "build": "shx rm -rf dist && tsc -b",
     "lint": "eslint . --ext .ts --config .eslintrc",
     "postpack": "shx rm -f oclif.manifest.json",
-    "prepack": "yarn build && oclif manifest && cp ../../README.md ./README.md",
+    "prepack": "yarn build && oclif manifest && rm -rf ./README.md && cp ../../README.md ./README.md",
     "test": "ts-mocha -p tsconfig.json --exit \"src/**/*.test.ts\"",
     "version": ""
   },
