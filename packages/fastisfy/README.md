@@ -1,6 +1,6 @@
 # Fastisfy
 
-Fastisfy is a satistfyingly fast and simple web framework to build REST APIs with Node.js on top of Fastify.
+Fastisfy is a satisfyingly fast and simple web framework to build REST APIs with Node.js with the power of Fastify.
 You can define routes using Next.js-like API and use the power of Fastify to build your APIs.
 
 ## Pre-requisites
@@ -38,14 +38,22 @@ export default async function server(fastify) {
 }
 ```
 
-### Parameters
+### Route Parameters
 
 You can use parameters in your routes by adding `[parameter]` to the route path. For example, if you want to create a route that returns the name of the user, you can create `users/[id].js` file and use `req.params.id` to get the user ID.
 
 ```js
+import { Type } from "@sinclair/typebox";
+
 export const get = async (req, reply) => {
   const user = await getUser(req.params.id);
   reply.send({ name: user.name });
+};
+
+get.schema = {
+  params: Type.Object({
+    id: Type.String(),
+  }),
 };
 ```
 
@@ -62,6 +70,9 @@ export const get = async (req, reply) => {
 };
 
 get.schema = {
+  params: Type.Object({
+    id: Type.String(),
+  }),
   response: {
     200: Type.Object({
       name: Type.String(),
@@ -75,9 +86,13 @@ get.schema = {
 Fastisfy emits TypeScript declaration files to help you write your routes in TypeScript. You can create `users/[id].ts` file and use TypeScript to define your routes.
 
 ```ts
+import * as fastisfy from "fastisfy";
 import { Type } from "@sinclair/typebox";
 
 const getSchema = {
+  params: Type.Object({
+    id: Type.String(),
+  }),
   response: {
     200: Type.Object({
       name: Type.String(),
@@ -96,7 +111,7 @@ export const get: fastisfy.RequestHandler<typeof getSchema> = async (
 get.schema = getSchema;
 ```
 
-In the above example, `fastisfy.RequestHandler` is a type that takes the schema object as a generic type and returns a function that takes `fastify.Request` and `fastify.Reply` as arguments. The schema will be automatically recognized by TypeScript and you will get type checking for your routes.
+In the above example, `fastisfy.RequestHandler` is a type that takes the schema object as a generic type and returns a function that takes `fastify.FastisfyRequest` and `fastify.FastisfyReply` as arguments. The schema will be automatically recognized by TypeScript and you will get type checking for your routes.
 
 ### Configuration
 
