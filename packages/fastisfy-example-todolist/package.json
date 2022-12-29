@@ -1,6 +1,6 @@
 {
   "name": "fastisfy-example-todolist",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "> TODO: description",
   "author": "Rizki Romadhoni <rrmdn@pm.me>",
   "homepage": "https://github.com/rrmdn/fastisfy#readme",
@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@sinclair/typebox": "^0.25.16",
-    "fastisfy": "^0.0.1",
+    "fastisfy": "^0.1.0",
     "sqlite3": "^5.1.4"
   },
   "private": true

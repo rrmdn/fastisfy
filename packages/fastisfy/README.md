@@ -15,7 +15,7 @@ $ npm install -g fastisfy
 $ fastisfy COMMAND
 running command...
 $ fastisfy (--version)
-fastisfy/0.0.1 linux-x64 node-v16.18.1
+fastisfy/0.1.0 linux-x64 node-v16.18.1
 $ fastisfy --help [COMMAND]
 USAGE
   $ fastisfy COMMAND
