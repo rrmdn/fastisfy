@@ -30,5 +30,6 @@
     "@sinclair/typebox": "^0.25.16",
     "fastisfy": "^0.0.1",
     "sqlite3": "^5.1.4"
-  }
+  },
+  "private": true
 }
