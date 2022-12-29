@@ -18,11 +18,11 @@ export const get = async (req, reply) => {
 };
 ```
 
-Run `npx fastisfy dev` to start the development server. You will be able to access your API at `http://localhost:3000/hello`, and it will return `{ "hello": "world" }`.
+Run `npx @rromadhoni/fastisfy dev` to start the development server. You will be able to access your API at `http://localhost:3000/hello`, and it will return `{ "hello": "world" }`.
 
 ## Deployment
 
-Run `npx fastisfy start` to start the production server. Everything is the same as the development server, but it is optimized for production.
+Run `npx @rromadhoni/fastisfy start` to start the production server. Everything is the same as the development server, but it is optimized for production.
 
 ## API
 
