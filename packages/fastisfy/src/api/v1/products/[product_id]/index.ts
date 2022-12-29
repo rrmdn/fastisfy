@@ -1,4 +1,5 @@
 import { Type } from "@sinclair/typebox";
+import * as fastisfy from "fastisfy";
 
 export const getSchema = {
   params: Type.Object({

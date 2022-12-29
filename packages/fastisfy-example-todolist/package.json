@@ -1,0 +1,34 @@
+{
+  "name": "fastisfy-example-todolist",
+  "version": "0.0.0",
+  "description": "> TODO: description",
+  "author": "Rizki Romadhoni <rrmdn@pm.me>",
+  "homepage": "https://github.com/rrmdn/fastisfy#readme",
+  "license": "MIT",
+  "main": "lib/fastisfy-example-todolist.js",
+  "directories": {
+    "lib": "lib",
+    "test": "__tests__"
+  },
+  "files": [
+    "lib"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rrmdn/fastisfy.git"
+  },
+  "scripts": {
+    "test": "node ./__tests__/fastisfy-example-todolist.test.js"
+  },
+  "bugs": {
+    "url": "https://github.com/rrmdn/fastisfy/issues"
+  },
+  "dependencies": {
+    "@sinclair/typebox": "^0.25.16",
+    "fastisfy": "^0.0.1",
+    "sqlite3": "^5.1.4"
+  }
+}

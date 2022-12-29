@@ -3,9 +3,16 @@ import * as swc from "@swc/core";
 import * as fastify from "fastify";
 import { importFromString } from "module-from-string";
 import path from "path";
+import * as fastisfy from "fastisfy";
 
 export default class RouterRegistry {
-  static allowedMethods = new Set(["get", "post", "put", "delete", "patch"]);
+  static allowedMethods: Record<string, string> = {
+    "del": "delete",
+    "get": "get",
+    "post": "post",
+    "put": "put",
+    "patch": "patch",
+  };
   handlersMap = new Map<string, string>();
   constructor(
     public rootAPI: string = path.resolve(path.join(process.cwd(), "api"))
@@ -68,10 +75,18 @@ export default class RouterRegistry {
       }
       if (!file) return;
       const serverFile: { default: fastisfy.FastisfyCustomServer } =
-        await importFromString(await this.parseHandler(file));
-      await serverFile.default(app, {});
+        await importFromString(await this.parseHandler(file), {
+          dirname: this.rootAPI,
+        });
+      try {
+        await serverFile.default(app, {});
+      } catch (error) {
+        console.log('Server file error: ');
+        console.error(error);
+      }
     } catch (error) {
       console.log('Custom server file not found. Skipping...')
+      console.error(error);
     }
   }
   async registerRoutes(app: fastify.FastifyInstance) {
@@ -86,15 +101,15 @@ export default class RouterRegistry {
           name !== "length" &&
           name !== "name" &&
           name !== "prototype" &&
-          RouterRegistry.allowedMethods.has(name)
+          RouterRegistry.allowedMethods[name]
       );
 
       for (const method of methods) {
         const requestHandler = routeHandler[method] as fastisfy.RequestHandler;
-        app[method](
+        app[RouterRegistry.allowedMethods[method]](
           route,
           { schema: requestHandler.schema },
-          async (req: fastisfy.Request, rep: fastisfy.Reply) => {
+          async (req: fastisfy.FastisfyRequest, rep: fastisfy.FastisfyReply) => {
             await requestHandler(req, rep);
           }
         );

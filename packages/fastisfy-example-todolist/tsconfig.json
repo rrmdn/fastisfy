@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "downlevelIteration": true,
+    "declaration": true,
+    "importHelpers": true,
+    "module": "commonjs",
+    "target": "es2019"
+  },
+  "include": ["api/**/*.ts", "fastisfy.d.ts"]
+}

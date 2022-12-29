@@ -6,7 +6,7 @@
   "bin": {
     "fastisfy": "./bin/run"
   },
-  "types": "types/fastisfy.d.ts",
+  "types": "src/types/fastisfy.d.ts",
   "files": [
     "/bin",
     "/dist",
