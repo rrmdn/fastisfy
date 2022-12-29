@@ -25,7 +25,9 @@ export default class Discover {
   static config = async (
     file = path.resolve(path.join(process.cwd(), "fastisfy.config.json"))
   ): Promise<Static<typeof FastisfyConfig>> => {
-    const configFile = await fs.readFile(file, "utf-8");
+    const configFile = await fs
+      .readFile(file, "utf-8")
+      .catch(() => JSON.stringify({ features: [] }));
     const parsed = JSON.parse(configFile);
     if (FastisfyConfigCompiler.Check(parsed)) {
       return parsed;

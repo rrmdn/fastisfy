@@ -18,4 +18,11 @@ describe("Discover", () => {
       );
     }
   });
+
+  it("should not throw an error if the config file is not found", async () => {
+    const config = await Discover.config(
+      path.resolve(path.join(__dirname, "notfound.json"))
+    );
+    expect(config.features.length).to.equal(0);
+  });
 });
