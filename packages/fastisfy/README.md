@@ -11,11 +11,11 @@ A fast and simple framework for building REST APIs with Fastify using filesystem
 # Usage
 <!-- usage -->
 ```sh-session
-$ npm install -g fastisfy
+$ npm install -g @rromadhoni/fastisfy
 $ fastisfy COMMAND
 running command...
 $ fastisfy (--version)
-fastisfy/0.1.0 linux-x64 node-v16.18.1
+@rromadhoni/fastisfy/0.1.0 linux-x64 node-v16.18.1
 $ fastisfy --help [COMMAND]
 USAGE
   $ fastisfy COMMAND

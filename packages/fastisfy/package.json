@@ -1,5 +1,5 @@
 {
-  "name": "fastisfy",
+  "name": "@rromadhoni/fastisfy",
   "version": "0.1.0",
   "description": "A fast and simple framework for building REST APIs with Fastify using filesystem routing",
   "author": "Rizki Romadhoni <rrmdn@pm.me>",
@@ -76,5 +76,6 @@
     "fastify": "^4.10.2",
     "fastify-oas": "^3.0.8",
     "module-from-string": "^3.3.0"
-  }
+  },
+  "gitHead": "5a3b68ba822f37058b78d723195c8d6d6f8ff2b6"
 }
