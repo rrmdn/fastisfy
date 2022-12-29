@@ -24,6 +24,16 @@ Run `npx @rromadhoni/fastisfy dev` to start the development server. You will be 
 
 Run `npx @rromadhoni/fastisfy start` to start the production server. Everything is the same as the development server, but it is optimized for production.
 
+## Environment Variables
+
+Fastisfy uses [dotenv](https://www.npmjs.com/package/dotenv) to load environment variables from `.env` file. You can create `.env` file in your project root to define environment variables. For example, if you want to define `PORT` environment variable, you can create `.env` file with the following content:
+
+```
+PORT=3000
+```
+
+Note that different command will prefer to load environment variables from different files. For example, `npx @rromadhoni/fastisfy dev` will load environment variables from `.env.development` file, and `npx @rromadhoni/fastisfy start` will load environment variables from `.env.production` file. However, if the file does not exist, it will fallback to `.env` file.
+
 ## API
 
 ### Custom server.js

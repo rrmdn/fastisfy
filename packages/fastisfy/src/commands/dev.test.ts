@@ -28,5 +28,7 @@ describe("dev", () => {
           total: 1,
         },
       });
+      const env = await axios.get("http://localhost:3000/env");
+      expect(env.data).to.have.property("SAMPLE_ENV", "DEVELOPMENT");
     });
 });

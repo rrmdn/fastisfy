@@ -19,9 +19,9 @@ export default class Dev extends Command {
   async run() {
     const { flags } = await this.parse(Dev);
     const config = await Discover.config();
-    const routerRegistry = new RouterRegistry(
-      path.resolve(path.join(process.cwd(), config.apiDir || "api"))
-    );
+    const root = path.resolve(path.join(process.cwd(), config.apiDir || "api"));
+    const routerRegistry = new RouterRegistry(root);
+    await Discover.env("development");
     await routerRegistry.scanDir(routerRegistry.rootAPI);
     const app = fastify.fastify();
     app.all(

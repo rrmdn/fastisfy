@@ -2,6 +2,7 @@ import fs from "fs/promises";
 import { Static, Type } from "@sinclair/typebox";
 import { TypeCompiler } from "@sinclair/typebox/compiler";
 import path from "path";
+import Dotenv from "dotenv";
 
 const FastisfyConfig = Type.Object({
   features: Type.Array(Type.String()),
@@ -39,5 +40,28 @@ export default class Discover {
           .map((e) => `${e.message} at ${e.path.replace(/\//g, ".")}`)
           .join(", ")
     );
+  };
+  /**
+   * This method is used to load environment variables
+   * @param prefered The prefered environment
+   */
+  static env = async (prefered = "production") => {
+    const root = process.cwd();
+    try {
+      const preferedEnv = path.resolve(path.join(root, `.env.${prefered}`));
+      await fs.access(preferedEnv);
+      Dotenv.config({ path: preferedEnv });
+      console.log(`Loaded environment variables from ${preferedEnv}`);
+    } catch (error) {
+      console.log(`No environment file found for ${prefered}`);
+      try {
+        const env = path.resolve(path.join(root, ".env"));
+        await fs.access(env);
+        Dotenv.config({ path: env });
+        console.log(`Loaded environment variables from ${env}`);
+      } catch (error) {
+        console.log(`No environment file found`);
+      }
+    }
   };
 }

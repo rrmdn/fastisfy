@@ -7,11 +7,11 @@ import * as fastisfy from "fastisfy";
 
 export default class RouterRegistry {
   static allowedMethods: Record<string, string> = {
-    "del": "delete",
-    "get": "get",
-    "post": "post",
-    "put": "put",
-    "patch": "patch",
+    del: "delete",
+    get: "get",
+    post: "post",
+    put: "put",
+    patch: "patch",
   };
   handlersMap = new Map<string, string>();
   constructor(
@@ -77,15 +77,16 @@ export default class RouterRegistry {
       const serverFile: { default: fastisfy.FastisfyCustomServer } =
         await importFromString(await this.parseHandler(file), {
           dirname: this.rootAPI,
+          useCurrentGlobal: true,
         });
       try {
         await serverFile.default(app, {});
       } catch (error) {
-        console.log('Server file error: ');
+        console.log("Server file error: ");
         console.error(error);
       }
     } catch (error) {
-      console.log('Custom server file not found. Skipping...')
+      console.log("Custom server file not found. Skipping...");
       console.error(error);
     }
   }
@@ -94,6 +95,7 @@ export default class RouterRegistry {
     for (const [route, value] of this.handlersMap.entries()) {
       const routeHandler = await importFromString(value, {
         dirname: this.rootAPI,
+        useCurrentGlobal: true,
       });
 
       const methods = Object.getOwnPropertyNames(routeHandler).filter(
@@ -109,7 +111,10 @@ export default class RouterRegistry {
         app[RouterRegistry.allowedMethods[method]](
           route,
           { schema: requestHandler.schema },
-          async (req: fastisfy.FastisfyRequest, rep: fastisfy.FastisfyReply) => {
+          async (
+            req: fastisfy.FastisfyRequest,
+            rep: fastisfy.FastisfyReply
+          ) => {
             await requestHandler(req, rep);
           }
         );
