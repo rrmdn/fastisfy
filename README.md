@@ -109,6 +109,10 @@ You can create `fastisfy.config.js` file in your project root to customize the c
   - `swagger` - Enable Swagger schema generation.
 - `apiDir` - The directory that contains your API routes. Default is `api` in the `cwd`.
 
+### Examples
+
+- [Todo List](/packages/fastisfy-example-todolist) - A simple todo list API using sqlite3.
+
 ## License
 
 MIT

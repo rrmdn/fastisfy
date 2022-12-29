@@ -1,11 +1,10 @@
 # `fastisfy-example-todolist`
 
-> TODO: description
+This is a simple todo list API using fastisfy and sqlite3 written in TypeScript.
 
-## Usage
+## Running the example
 
-```
-const fastisfyExampleTodolist = require('fastisfy-example-todolist');
-
-// TODO: DEMONSTRATE API
+```bash
+yarn
+yarn fastisfy start
 ```
