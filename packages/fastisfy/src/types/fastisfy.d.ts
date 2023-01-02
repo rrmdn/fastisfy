@@ -1,5 +1,22 @@
 declare module "fastisfy" {
   import * as fastify from "fastify";
+  export interface FastisfyRequestContextData {
+    [key: string]: any;
+    user: {
+      id: string;
+      role: string;
+    };
+  }
+
+  export interface FastisfyRequestContext {
+    get<K extends keyof FastisfyRequestContextData>(
+      key: K
+    ): FastisfyRequestContextData[K] | undefined;
+    set<K extends keyof FastisfyRequestContextData>(
+      key: K,
+      value: FastisfyRequestContextData[K]
+    ): void;
+  }
 
   export type FastisfyInstance = import("fastify").FastifyInstance<
     import("fastify").RawServerDefault,
@@ -26,8 +43,6 @@ declare module "fastisfy" {
     response?: Record<string, import("@sinclair/typebox").TSchema>;
   };
 
-  export interface RequestContext {}
-
   export interface FastisfyRequest<
     TSchema extends FastisfySchema = FastisfySchema
   > extends fastify.FastifyRequest<
@@ -36,9 +51,11 @@ declare module "fastisfy" {
       fastify.RawRequestDefaultExpression<fastify.RawServerDefault>,
       TSchema,
       import("@fastify/type-provider-typebox").TypeBoxTypeProvider,
-      RequestContext,
+      unknown,
       fastify.FastifyBaseLogger
-    > {}
+    > {
+    requestContext: FastisfyRequestContext;
+  }
 
   export interface FastisfyReply<
     TSchema extends FastisfySchema = FastisfySchema
@@ -59,5 +76,10 @@ declare module "fastisfy" {
         rep: FastisfyReply<TSchema>
       ): Promise<void>;
       schema?: TSchema;
+      allow?: string[];
     };
+
+  export interface Authenticate {
+    (req: FastisfyRequest): Promise<{ id: string; role: string }>;
+  }
 }

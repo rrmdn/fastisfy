@@ -20,11 +20,11 @@ export default class Start extends Command {
     const { flags } = await this.parse(Start);
     const config = await Discover.config();
     const root = path.resolve(path.join(process.cwd(), config.apiDir || "api"));
-    const routerRegistry = new RouterRegistry(root);
+    const routerRegistry = new RouterRegistry(config, root);
     await Discover.env("production");
     const app = fastify.fastify().withTypeProvider<TypeBoxTypeProvider>();
     await applyFeatures(app, { port: flags.port, safe: true });
-    await routerRegistry.scanDir(routerRegistry.rootAPI);
+    await routerRegistry.scanDir(config.apiDir);
     await routerRegistry.registerRoutes(app);
 
     app.setErrorHandler((err, req, rep) => {

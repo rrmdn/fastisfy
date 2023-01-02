@@ -1,4 +1,6 @@
 import os from "os";
+import auth from "@fastify/auth";
+import requestContext from "@fastify/request-context";
 import { FastifyInstance } from "fastify";
 import Discover from "./Discover/Discover";
 
@@ -8,6 +10,7 @@ export default async function applyFeatures(
 ) {
   const config = await Discover.config();
   const features = new Set(config.features);
+  await app.register(requestContext);
   if (features.has("compression") && opts.safe) {
     await app.register(require("@fastify/compress"));
     console.log("Compression enabled");
@@ -52,5 +55,9 @@ export default async function applyFeatures(
       staticCSP: true,
       transformSpecificationClone: true,
     });
+  }
+  if (features.has("auth")) {
+    await app.register(auth);
+    console.log("Auth enabled");
   }
 }

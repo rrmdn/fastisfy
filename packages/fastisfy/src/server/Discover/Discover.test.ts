@@ -5,7 +5,7 @@ import Discover from "./Discover";
 describe("Discover", () => {
   it("should parse the config file", async () => {
     const config = await Discover.config();
-    expect(config.features.length).to.equal(4);
+    expect(config.features.length).to.equal(5);
   });
 
   it("should throw an error if the config file is invalid", async () => {

@@ -1,9 +1,13 @@
 import fs from "fs/promises";
-import * as swc from "@swc/core";
 import * as fastify from "fastify";
 import { importFromString } from "module-from-string";
 import path from "path";
+import { Forbidden } from "http-errors";
 import * as fastisfy from "fastisfy";
+import CodeLoader from "./CodeLoader";
+import AuthorizationHandler from "./AuthorizationHandler";
+import { FastisfyConfig } from "../server/Discover/Discover";
+import { Static } from "@sinclair/typebox";
 
 export default class RouterRegistry {
   static allowedMethods: Record<string, string> = {
@@ -15,6 +19,7 @@ export default class RouterRegistry {
   };
   handlersMap = new Map<string, string>();
   constructor(
+    private config: Static<typeof FastisfyConfig>,
     public rootAPI: string = path.resolve(path.join(process.cwd(), "api"))
   ) {}
   async scanDir(dir: string) {
@@ -38,21 +43,8 @@ export default class RouterRegistry {
       .split(".")[0]
       .replace(/\[([^\]]+)\]/g, ":$1")
       .replace(/\/index$/, "");
-    const handlerCode = await this.parseHandler(entryPath);
+    const handlerCode = await CodeLoader.parseHandler(entryPath);
     this.handlersMap.set(routePath, handlerCode);
-  }
-  async parseHandler(path: string) {
-    const result = await swc.transformFile(path, {
-      jsc: {
-        parser: {
-          syntax: path.endsWith(".ts") ? "typescript" : "ecmascript",
-          dynamicImport: true,
-        },
-        transform: {},
-      },
-    });
-
-    return result.code;
   }
   /**
    * Look for a file named _server.js or _server.ts in the api folder
@@ -61,24 +53,10 @@ export default class RouterRegistry {
    */
   async loadServerFile(app: fastify.FastifyInstance) {
     try {
-      let file: string | null = null;
-      try {
-        file = path.resolve(`${this.rootAPI}/_server.js`);
-        await fs.access(file);
-      } catch (error) {
-        try {
-          file = path.resolve(`${this.rootAPI}/_server.ts`);
-          await fs.access(file);
-        } catch (error) {
-          file = null;
-        }
-      }
-      if (!file) return;
-      const serverFile: { default: fastisfy.FastisfyCustomServer } =
-        await importFromString(await this.parseHandler(file), {
-          dirname: this.rootAPI,
-          useCurrentGlobal: true,
-        });
+      const serverFile = await CodeLoader.implements<{
+        default: fastisfy.FastisfyCustomServer;
+      }>(`${this.config.apiDir}/_server`, { default: async () => {} });
+
       try {
         await serverFile.default(app, {});
       } catch (error) {
@@ -92,6 +70,8 @@ export default class RouterRegistry {
   }
   async registerRoutes(app: fastify.FastifyInstance) {
     await this.loadServerFile(app);
+    const authHandler = new AuthorizationHandler(this.config);
+    const isAuthEnabled = this.config.features.includes("auth");
     for (const [route, value] of this.handlersMap.entries()) {
       const routeHandler = await importFromString(value, {
         dirname: this.rootAPI,
@@ -99,18 +79,31 @@ export default class RouterRegistry {
       });
 
       const methods = Object.getOwnPropertyNames(routeHandler).filter(
-        (name) =>
-          name !== "length" &&
-          name !== "name" &&
-          name !== "prototype" &&
-          RouterRegistry.allowedMethods[name]
+        (name) => !!RouterRegistry.allowedMethods[name]
       );
 
       for (const method of methods) {
         const requestHandler = routeHandler[method] as fastisfy.RequestHandler;
+        const allowList = requestHandler.allow || ["public"];
         app[RouterRegistry.allowedMethods[method]](
           route,
-          { schema: requestHandler.schema },
+          {
+            schema: requestHandler.schema,
+            preHandler: isAuthEnabled
+              ? app.auth([
+                  (req, rep, done) => {
+                    authHandler
+                      .isAllowed(req, allowList)
+                      .then((allowed) => {
+                        done(
+                          allowed ? undefined : new Forbidden("Not allowed")
+                        );
+                      })
+                      .catch(done);
+                  },
+                ])
+              : undefined,
+          },
           async (
             req: fastisfy.FastisfyRequest,
             rep: fastisfy.FastisfyReply

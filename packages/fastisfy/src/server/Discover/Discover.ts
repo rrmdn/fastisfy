@@ -4,9 +4,10 @@ import { TypeCompiler } from "@sinclair/typebox/compiler";
 import path from "path";
 import Dotenv from "dotenv";
 
-const FastisfyConfig = Type.Object({
+export const FastisfyConfig = Type.Object({
   features: Type.Array(Type.String()),
-  apiDir: Type.Optional(Type.String()),
+  apiDir: Type.Optional(Type.String({ default: "api" })),
+  auth: Type.Optional(Type.Object({ roles: Type.Array(Type.String()) })),
 });
 
 const FastisfyConfigCompiler = TypeCompiler.Compile(FastisfyConfig);
@@ -31,6 +32,7 @@ export default class Discover {
       .catch(() => JSON.stringify({ features: [] }));
     const parsed = JSON.parse(configFile);
     if (FastisfyConfigCompiler.Check(parsed)) {
+      parsed.apiDir = path.resolve(path.join(process.cwd(), parsed.apiDir || "api"));
       return parsed;
     }
     const errors = FastisfyConfigCompiler.Errors(parsed);

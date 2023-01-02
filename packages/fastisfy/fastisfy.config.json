@@ -1,4 +1,7 @@
 {
-  "features": ["swagger", "compression", "cors", "overload-protection"],
-  "apiDir": "src/api"
+  "features": ["swagger", "compression", "cors", "overload-protection", "auth"],
+  "apiDir": "src/api",
+  "auth": {
+    "roles": ["public", "user", "admin"]
+  }
 }

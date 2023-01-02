@@ -1,7 +1,7 @@
 import { expect, test } from "@oclif/test";
 import axios from "axios";
 
-describe("dev", () => {
+describe("start", () => {
   test
     .stdout()
     .command(["start", "--port", "3001"])
@@ -30,5 +30,22 @@ describe("dev", () => {
       });
       const env = await axios.get("http://localhost:3001/env");
       expect(env.data).to.have.property("SAMPLE_ENV", "ROOT");
+      const token = await axios.post<{ token: string }>(
+        "http://localhost:3001/v1/login",
+        {
+          email: "hello@pm.me",
+          password: "123",
+        }
+      );
+      expect(token.data).to.have.property("token");
+      const user = await axios.get("http://localhost:3001/v1/me", {
+        headers: {
+          Authorization: `Bearer ${token.data.token}`,
+        },
+      });
+      expect(user.data).to.deep.equal({
+        id: "hello@pm.me",
+        role: "user",
+      });
     });
 });
