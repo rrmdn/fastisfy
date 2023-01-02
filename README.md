@@ -134,6 +134,98 @@ You can create `fastisfy.config.js` file in your project root to customize the c
   - `swagger` - Enable Swagger schema generation.
 - `apiDir` - The directory that contains your API routes. Default is `api` in the `cwd`.
 
+### Authentication & Authorization
+
+Fastisfy supports authentication and authorization using `@fastify/auth` plugin. You can create `_auth.js` file in your project root to define your authentication and authorization logic. The file should export the following properties:
+
+```js
+export const authenticate = async (req, reply) => {
+  // Authenticate the request
+  return { id: "user-id", role: "user" };
+};
+```
+
+The `authenticate` function will be called before every request and should return an object that contains the user information. The user information will be accesible in the `req.requestContext` property.
+
+```js
+// api/users/me.js
+export const get = async (req, reply) => {
+  const user = req.requestContext.get("user");
+  const profile = await getProfile(user.id);
+  reply.send(profile);
+};
+
+get.allow = ["user"];
+```
+This example uses the `allow` property to define the roles that are allowed to access the route. If the user role is not in the `allow` array, the request will be rejected with `403 Forbidden` error.
+
+Fastisfy lets you define the authentication strategy in the `_auth.js` file. You can use any authentication strategy that is supported by Fastify. For example, if you want to use JWT authentication, you can install `@fastify/jwt` plugin and use it in the `_auth.js` file. But first you need to register the plugin in the `_server.js` file.
+
+```js
+import fastifyJwt from "@fastify/jwt";
+
+// _server.js
+export default async function (app, opts) {
+  await app.register(fastifyJwt, {
+    secret: "supersecret",
+  });
+}
+```
+
+From there, you can use the methods provided by the plugin to authenticate the request.
+
+```js
+// _auth.js
+export const authenticate = async (req) => {
+  try {
+    if (!req.headers.authorization) throw new Error("No authorization header");
+    return req.jwtVerify();
+  } catch (error) {
+    return { id: "anonymous", role: "public" };
+  }
+};
+```
+
+This example uses the `jwtVerify` method provided by the `@fastify/jwt` plugin to authenticate the request. If the request is authenticated, the method will return the user information. If the request is not authenticated, the method will throw an error and the `authenticate` function will return the default user information, which is an anonymous user with `public` role.
+
+To test this example, you need to implement a login route that signs a JWT token and returns it to the client. You can use the `jwtSign` method provided by the `@fastify/jwt` plugin to sign the token.
+
+```js
+// api/auth/login.js
+import { Type } from "@sinclair/typebox";
+
+export const post = async (req, rep) => {
+  const { email } = req.body;
+  const token = await rep.jwtSign({ id: email, role: "user" });
+  rep.status(200).send({ token });
+};
+
+post.schema = {
+  body: Type.Object({
+    email: Type.String(),
+    password: Type.String(),
+  }),
+  response: {
+    200: Type.Object({
+      token: Type.String(),
+    }),
+  },
+};
+```
+
+Now you can test the authentication by sending a request to the login route and passing the token in the `Authorization` header to the protected route.
+
+1. Login
+
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{"email": "hello@pm.me", "password": "123"}' http://localhost:3000/api/auth/login
+```
+2. Get user profile
+
+```bash
+curl -X POST -H "Content-Type: application/json" -H "Authorization: Bearer <insert-token-here>" http://localhost:3000/api/users/me
+```
+
 ### Examples
 
 - [Todo List](/packages/fastisfy-example-todolist) - A simple todo list API using sqlite3.
